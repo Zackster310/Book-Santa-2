@@ -24,6 +24,7 @@ export default class RecieverDetailsScreen extends Component{
 
 
 getRecieverDetails(){
+  console.log("email:" + this.state.recieverId)
   db.collection('users').where('email_id','==',this.state.recieverId).get()
   .then(snapshot=>{
     snapshot.forEach(doc=>{
@@ -34,6 +35,8 @@ getRecieverDetails(){
       })
     })
   });
+
+  console.log("name:" + this.state.recieverName)
 
   db.collection('requested_books').where('request_id','==',this.state.requestId).get()
   .then(snapshot=>{
@@ -52,6 +55,20 @@ updateBookStatus=()=>{
   })
 }
 
+addNotification = () => {
+  console.log("Notification")
+  
+  var message = this.state.userId + "has shown interest in donating the book"
+  db.collection("all_notifications").add({
+    "targeted_user_id": this.state.recieverId, 
+    "donor_id": this.state.userId,
+    "request_id": this.state.requestId,
+    "book_name": this.state.bookName,
+    "notification_status": "unread",
+    "message": message,
+    "date": firebase.firestore.FieldValue.serverTimestamp()
+  })
+}
 
 
 componentDidMount(){
@@ -88,7 +105,7 @@ componentDidMount(){
             titleStyle= {{fontSize : 20}}
             >
             <Card>
-              <Text style={{fontWeight:'bold'}}>Name: {this.state.recieverName}</Text>
+              <Text style={{fontWeight:'bold'}}>Name: {this.state.recieverName} </Text>
             </Card>
             <Card>
               <Text style={{fontWeight:'bold'}}>Contact: {this.state.recieverContact}</Text>
@@ -105,6 +122,7 @@ componentDidMount(){
               <TouchableOpacity
                   style={styles.button}
                   onPress={()=>{
+                    this.addNotification()
                     this.updateBookStatus()
                     this.props.navigation.navigate('MyDonations')
                   }}>

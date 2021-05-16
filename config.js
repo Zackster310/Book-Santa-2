@@ -1,19 +1,16 @@
-import firebase from 'firebase';
+import firebase from 'firebase'
 require('@firebase/firestore')
 
+// Your web app's Firebase configuration
 var firebaseConfig = {
-    apiKey: "AIzaSyASyOjOtJla-X-b3io2eLoaUc_bIRFSIIc",
-    authDomain: "book-santa-app.firebaseapp.com",
-    databaseURL: "https://book-santa-app.firebaseio.com",
-    projectId: "book-santa-app",
-    storageBucket: "book-santa-app.appspot.com",
-    messagingSenderId: "69634746716",
-    appId: "1:69634746716:web:6fbbfc110fb4475365f999",
-    measurementId: "G-DLB7XC0JPL"
-  };
-
-
+  apiKey: "AIzaSyA8KK4-PTKz0HCJfTRwClBk_wycIvhKL8A",
+  authDomain: "book-santa-5a1f9.firebaseapp.com",
+  projectId: "book-santa-5a1f9",
+  storageBucket: "book-santa-5a1f9.appspot.com",
+  messagingSenderId: "785233491489",
+  appId: "1:785233491489:web:d96a1d086fe4839d849560"
+};
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-export default firebase.firestore();
+export default firebase.firestore()
