@@ -16,8 +16,14 @@ export default class BookRequestScreen extends Component{
     super();
     this.state ={
       userId : firebase.auth().currentUser.email,
-      bookName:"",
-      reasonToRequest:""
+      bookName: "",
+      reasonToRequest: "",
+      requestId: "",
+      requestedBookName: "",
+      bookStatus: "",
+      docId: "",
+      isBookRequestActive: "",
+      userDocId: ""
     }
   }
 
@@ -25,16 +31,46 @@ export default class BookRequestScreen extends Component{
     return Math.random().toString(36).substring(7);
   }
 
+  getBookRequest = () => {
+    var bookRequest = db.collection('requested_books').where('user_id','==',this.state.userId).get().then((snapshot) => {
+      snapshot.forEach((doc) => {
+        if(doc.data() != "received"){
+          this.setState({
+            requestId: doc.data().request_id,
+            requestedBookName: doc.data().book_name,
+            bookStatus: doc.data().book_status,
+            docId: doc.id
+          })
+        }
+      })
+    })
+  }
 
+  getIsBookRequestActive(){
+    db.collection('users').where('email_id','==',this.state.userId).onSnapshot(snapshot => {
+      snapshot.forEach(doc => {this.setState({
+        isBookRequestActive: doc.data().isBookRequestActive,
+        userDocId: doc.id
+      })})
+    })
+    console.log(this.state.isBookRequestActive + " BookRequestActive")
+  }
 
-  addRequest =(bookName,reasonToRequest)=>{
+  addRequest = async (bookName,reasonToRequest) => {
     var userId = this.state.userId
     var randomRequestId = this.createUniqueId()
     db.collection('requested_books').add({
         "user_id": userId,
-        "book_name":bookName,
-        "reason_to_request":reasonToRequest,
-        "request_id"  : randomRequestId,
+        "book_name": bookName,
+        "reason_to_request": reasonToRequest,
+        "request_id": randomRequestId,
+        "book_status": "requested"
+    })
+
+    await this.getBookRequest()
+    console.log(this.state.userId + "getBookRequest")
+    db.collection('users').where('email_id','==',this.state.userId).get().then((snapshot) => {
+      snapshot.forEach((doc) => {db.collection('users').doc("LaE8whFmWZl6AUfdpOPd").update({isBookRequestActive: true})})
     })
 
     this.setState({
@@ -45,9 +81,22 @@ export default class BookRequestScreen extends Component{
     return Alert.alert("Book Requested Successfully")
   }
 
+  componentDidMount(){
+    this.getBookRequest()
+    this.getIsBookRequestActive()
+  }
 
   render(){
-    return(
+    if(this.state.isBookRequestActive == true){
+      return(
+        <View>
+          <Text>Book Name: {this.state.requestedBookName} </Text>
+          <Text>Book Status: {this.state.bookStatus} </Text>
+        </View>
+      )
+    }
+    else{
+      return(
         <View style={{flex:1}}>
           <MyHeader title="Request Book" navigation ={this.props.navigation}/>
             <KeyboardAvoidingView style={styles.keyBoardStyle}>
@@ -81,7 +130,8 @@ export default class BookRequestScreen extends Component{
               </TouchableOpacity>
             </KeyboardAvoidingView>
         </View>
-    )
+      )
+    }
   }
 }
 
